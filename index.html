@@ -1,0 +1,1048 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="description" content="Spiker SP-1: a 148 g sprint spike with a carbon plate and seven 7 mm pins, built for the first 30 metres.">
+<meta name="theme-color" content="#B9381F">
+<meta property="og:title" content="Spiker">
+<meta property="og:description" content="Track spikes built for the first 30 metres. First off the line.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='8' fill='%23B9381F'/%3E%3Cg transform='translate(8 18) scale(.48)' fill='%23fff'%3E%3Cpath d='M18 9 L100 30 L18 51 L34 30 Z'/%3E%3Cpath d='M0 21 H13 V39 H0 Z'/%3E%3C/g%3E%3C/svg%3E">
+<style>:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0}img{max-width:100%}[hidden]{display:none!important}</style>
+<title>Spiker</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=Barlow:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+<script>
+(function () {
+  var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (!reduce && window.gsap && window.ScrollTrigger) document.documentElement.classList.add("motion");
+})();
+</script>
+<style>
+/* Layout: a pinned red-track stage where scroll drives one 3D spike from hero, to exploded side view, to sole view; then a start-line band and white, ink and red bands for range, fit, specs and the last call */
+:root{
+  --track:#B9381F;
+  --track-deep:#86240F;
+  --track-glow:#D9532F;
+  --lane:#FFFFFF;
+  --lane-soft:rgba(255,255,255,.78);
+  --lane-faint:rgba(255,255,255,.24);
+  --ink:#14151B;
+  --ink-2:#22232B;
+  --ink-soft:#50525C;
+  --paper:#ECEEF0;
+  --rule:#CDD0D5;
+  --cobalt:#2B50E8;
+  --nav-glass:rgba(20,21,27,.86);
+  --shade:rgba(20,21,27,.38);
+  --font-display:"Big Shoulders Display","Arial Narrow",Impact,sans-serif;
+  --font-body:"Barlow","Helvetica Neue",Arial,sans-serif;
+  --font-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  --gl:max(16px, env(safe-area-inset-left, 0px));
+  --gr:max(16px, env(safe-area-inset-right, 0px));
+}
+*,*::before,*::after{box-sizing:border-box}
+html{background:var(--ink);overflow-x:clip}
+body{background:var(--ink);color:var(--lane);font-family:var(--font-body);font-size:17px;line-height:1.55;overflow-x:clip;-webkit-font-smoothing:antialiased}
+html.lenis,html.lenis body{height:auto}
+.lenis.lenis-smooth{scroll-behavior:auto!important}
+.lenis.lenis-stopped{overflow:hidden}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--lane);outline-offset:3px}
+.band-light :focus-visible{outline-color:var(--track)}
+h1,h2,h3{font-family:var(--font-display);font-weight:900;text-transform:uppercase;line-height:.88;letter-spacing:-.005em;text-wrap:balance;margin:0}
+p{margin:0}
+.wrap{max-width:1200px;margin-inline:auto;padding-left:var(--gl);padding-right:var(--gr)}
+.eyebrow{font-family:var(--font-mono);font-weight:500;font-size:.78rem;letter-spacing:.14em;text-transform:uppercase}
+
+/* Nav */
+.nav{position:fixed;top:0;left:0;right:0;z-index:50;padding-top:env(safe-area-inset-top,0px);transition:background-color .3s ease}
+.nav.is-solid{background:var(--nav-glass);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px)}
+.nav-inner{max-width:1200px;margin-inline:auto;padding-left:var(--gl);padding-right:var(--gr);padding-block:14px;display:flex;align-items:center;gap:28px}
+.brand{display:inline-flex;align-items:center;gap:10px;text-decoration:none;color:var(--lane)}
+.brand svg{width:34px;height:20px;fill:currentColor}
+.brand span{font-family:var(--font-display);font-weight:900;font-size:1.6rem;letter-spacing:.04em;line-height:1}
+.nav-links{display:flex;gap:26px;margin-left:auto}
+.nav-links a{text-decoration:none;font-weight:600;font-size:.95rem;color:var(--lane-soft)}
+.nav-links a:hover{color:var(--lane)}
+@media (max-width:760px){.nav-links{display:none}.nav .btn{margin-left:auto}}
+
+/* Buttons */
+.btn{font-family:var(--font-body);font-weight:700;font-size:1rem;line-height:1;letter-spacing:.02em;text-transform:uppercase;border:0;border-radius:2px;padding:16px 24px;cursor:pointer;display:inline-flex;align-items:center;gap:10px;text-decoration:none;transition:transform .15s ease, box-shadow .15s ease, background-color .2s ease, color .2s ease}
+.btn-white{background:var(--lane);color:var(--ink);box-shadow:5px 5px 0 var(--ink)}
+.btn-white:hover{transform:translate(-2px,-2px);box-shadow:7px 7px 0 var(--ink)}
+.btn-white:active{transform:translate(4px,4px);box-shadow:1px 1px 0 var(--ink)}
+.btn-line{background:transparent;color:var(--lane);box-shadow:inset 0 0 0 2px var(--lane-soft)}
+.btn-line:hover{box-shadow:inset 0 0 0 2px var(--lane)}
+.btn-sm{padding:11px 16px;font-size:.85rem;box-shadow:4px 4px 0 var(--ink)}
+
+/* Stage */
+.stage{position:relative;overflow:hidden;padding-top:88px;background:radial-gradient(60% 50% at 62% 36%, var(--track-glow) 0%, transparent 72%),linear-gradient(180deg, var(--track-deep) 0%, var(--track) 30%, var(--track) 100%)}
+.lanes{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none}
+.mega{position:absolute;left:0;right:0;top:26%;z-index:1;pointer-events:none;user-select:none;white-space:nowrap;line-height:.8}
+.mega span{display:inline-block;font-family:var(--font-display);font-weight:900;font-size:clamp(8rem,27vw,25rem);color:transparent;-webkit-text-stroke:2px var(--lane-faint);padding-left:2vw;transform:skewX(-10deg)}
+.shoe-wrap{position:relative;z-index:3;height:min(56svh,460px);pointer-events:none}
+.shoe-wrap canvas{position:absolute;inset:0;width:100%;height:100%;display:block;opacity:0;transition:opacity .9s ease}
+.shoe-wrap canvas.ready{opacity:1}
+.shoe-fallback{position:absolute;left:50%;top:50%;width:min(80%,560px);transform:translate(-50%,-50%)}
+.shoe-fallback svg{display:block;width:100%;height:auto;filter:drop-shadow(0 24px 22px var(--shade))}
+.callouts{position:absolute;inset:0;z-index:5;pointer-events:none}
+.callout{position:absolute;left:0;top:0;opacity:0}
+.callout .dot{position:absolute;left:-6px;top:-6px;width:12px;height:12px;border-radius:50%;background:var(--lane);box-shadow:0 0 0 5px var(--lane-faint)}
+.callout .leader{position:absolute;left:0;top:-1px;height:2px;background:var(--lane);transform-origin:0 50%}
+.callout .tag{position:absolute;left:0;top:0;white-space:nowrap;font-family:var(--font-mono);font-weight:500;font-size:.8rem;line-height:1.2;padding:8px 11px;background:var(--ink);color:var(--lane);border-radius:2px}
+.clock{position:absolute;z-index:4;top:92px;right:var(--gr);display:grid;justify-items:end;gap:2px;font-family:var(--font-mono);color:var(--lane)}
+.clock-label{font-size:.68rem;letter-spacing:.16em;text-transform:uppercase;color:var(--lane-soft)}
+.clock-time{font-size:clamp(1.6rem,2.6vw,2.2rem);font-weight:600;font-variant-numeric:tabular-nums;line-height:1}
+.stage-panels{position:relative;z-index:4;max-width:1200px;margin-inline:auto;padding-left:var(--gl);padding-right:var(--gr);padding-block:8px 88px;display:grid;gap:56px}
+.panel{max-width:32rem}
+.panel .eyebrow{color:var(--lane-soft)}
+.panel h1{font-size:clamp(3.6rem,8.4vw,7.6rem);margin-block:14px 18px}
+.panel h2{font-size:clamp(3rem,6.4vw,5.8rem);margin-block:14px 18px}
+.panel .lede{font-size:clamp(1.05rem,1.3vw,1.2rem);color:var(--lane-soft);max-width:28rem}
+.actions{display:flex;flex-wrap:wrap;gap:14px;margin-top:28px}
+.colorways{display:flex;align-items:center;flex-wrap:wrap;gap:10px;margin-top:26px}
+.cw-label{font-family:var(--font-mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--lane-soft);margin-right:4px}
+.swatch{width:34px;height:34px;border-radius:50%;border:0;padding:0;cursor:pointer;background:var(--sw);box-shadow:inset 0 0 0 2px var(--lane-faint);transition:transform .2s ease, box-shadow .2s ease}
+.swatch:hover{transform:scale(1.08)}
+.swatch[aria-pressed="true"]{box-shadow:0 0 0 3px var(--track),0 0 0 5px var(--lane)}
+.cw-name{font-family:var(--font-mono);font-weight:600;font-size:.9rem;margin-left:6px}
+.facts-inline{display:flex;flex-wrap:wrap;gap:8px 18px;margin:22px 0 0;padding:0;list-style:none;font-family:var(--font-mono);font-size:.85rem;color:var(--lane)}
+.facts-inline li{display:flex;gap:8px;align-items:baseline}
+.facts-inline b{font-family:var(--font-display);font-weight:800;font-size:1.6rem;line-height:1}
+.scroll-hint{display:none}
+
+/* Stage, scroll-driven */
+.motion .stage{height:100svh;min-height:620px;padding-top:0}
+.motion .shoe-wrap{position:absolute;inset:0;height:auto}
+.motion .stage-panels{height:100%;padding-block:100px 70px;grid-template-columns:minmax(0,1fr);grid-template-rows:minmax(0,1fr);align-items:center;gap:0}
+.motion .panel{grid-area:1/1;width:min(30rem,38%)}
+.motion .p3{justify-self:end}
+.motion .p2,.motion .p3{visibility:hidden;opacity:0}
+.motion .scroll-hint{position:absolute;z-index:4;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%);display:flex;align-items:center;gap:10px;font-family:var(--font-mono);font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;color:var(--lane-soft)}
+.scroll-hint i{display:block;width:40px;height:2px;background:var(--lane);transform-origin:left;animation:dash 1.4s ease-in-out infinite}
+@keyframes dash{0%{transform:scaleX(0)}55%{transform:scaleX(1);opacity:1}100%{transform:scaleX(1);opacity:0}}
+@media (max-width:760px){
+  .motion .stage-panels{align-items:end;padding-block:80px 34px}
+  .motion .panel{width:100%}
+  .motion .p3{justify-self:start}
+  .panel h1{font-size:clamp(3rem,15vw,4.2rem);margin-block:10px 12px}
+  .panel h2{font-size:clamp(2.6rem,12vw,3.6rem);margin-block:10px 12px}
+  .panel .lede{font-size:1rem}
+  .actions{margin-top:18px}
+  .colorways{margin-top:16px}
+  .clock{top:76px}
+  .callout .tag{font-size:.66rem;padding:6px 8px}
+  .motion .scroll-hint{display:none}
+}
+
+/* Start line */
+.startline{position:relative;z-index:5;background:var(--lane);color:var(--track);overflow:hidden;border-top:6px solid var(--ink)}
+.startline-track{display:flex;width:max-content}
+.lane-cell{display:flex;align-items:center;justify-content:center;gap:14px;width:clamp(130px,16vw,220px);height:clamp(92px,11vw,140px);border-left:3px solid var(--track);font-family:var(--font-display);font-weight:900;font-size:clamp(3.2rem,7vw,6rem);line-height:1}
+.lane-cell small{font-family:var(--font-mono);font-weight:500;font-size:.72rem;letter-spacing:.14em;color:var(--ink-soft)}
+
+/* Bands */
+.band{position:relative;padding-block:clamp(88px,10vw,140px)}
+.band-light{background:var(--paper);color:var(--ink)}
+.band-ink{background:var(--ink);color:var(--lane)}
+.band-track{background:var(--track);color:var(--lane)}
+.section-head{display:grid;gap:16px;max-width:44rem;margin-bottom:clamp(44px,6vw,72px)}
+.section-head h2{font-size:clamp(3rem,7vw,6rem)}
+.band-light .eyebrow{color:var(--track)}
+.band-ink .eyebrow,.band-track .eyebrow{color:var(--lane-soft)}
+.lede{font-size:1.15rem;max-width:36rem}
+.band-light .lede{color:var(--ink-soft)}
+.band-ink .lede,.band-track .lede{color:var(--lane-soft)}
+
+/* Range */
+.range-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(22px,3vw,36px)}
+@media (max-width:900px){.range-grid{grid-template-columns:minmax(0,1fr);max-width:30rem;margin-inline:auto}}
+.model{display:grid;gap:12px;align-content:start;min-width:0}
+.shot{position:relative;aspect-ratio:720/380;max-width:100%;background:var(--lane);border-bottom:5px solid var(--track);display:grid;place-items:center;overflow:hidden}
+.shot::before{content:"";position:absolute;inset:auto 0 18% 0;height:2px;background:var(--paper)}
+.shot img,.shot svg{position:relative;display:block;width:94%;height:auto;transition:transform .5s cubic-bezier(.2,.8,.2,1)}
+.model:hover .shot img,.model:hover .shot svg{transform:translateX(4%) rotate(-4deg)}
+.model-meta{display:flex;justify-content:space-between;gap:12px;font-family:var(--font-mono);font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}
+.model-meta b{color:var(--track);font-weight:600}
+.model h3{font-size:2.6rem;color:var(--ink)}
+.model p{color:var(--ink-soft)}
+.model-specs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:4px 0 0;border-top:2px solid var(--ink);padding-top:12px;font-variant-numeric:tabular-nums}
+.model-specs div{display:grid;gap:2px}
+.model-specs dt{font-family:var(--font-mono);font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--ink-soft)}
+.model-specs dd{margin:0;font-family:var(--font-display);font-weight:800;font-size:1.7rem;line-height:1;color:var(--ink)}
+
+/* Fit */
+.fit-grid{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);gap:clamp(36px,6vw,96px);align-items:start}
+.fit-grid .section-head{margin-bottom:0}
+@media (max-width:900px){.fit-grid{grid-template-columns:minmax(0,1fr)}}
+.sizer{display:grid;gap:26px;min-width:0}
+.size-label{font-family:var(--font-mono);font-size:.74rem;letter-spacing:.14em;text-transform:uppercase;color:var(--lane-soft)}
+.size-chips{display:flex;flex-wrap:wrap;gap:8px}
+.size-chip{font-family:var(--font-mono);font-size:.95rem;font-weight:500;min-width:58px;padding:12px 10px;background:transparent;color:var(--lane);border:1.5px solid var(--lane-faint);border-radius:2px;cursor:pointer;font-variant-numeric:tabular-nums;transition:background-color .2s ease,border-color .2s ease}
+.size-chip:hover{border-color:var(--lane)}
+.size-chip[aria-pressed="true"]{background:var(--track);border-color:var(--track)}
+.size-out{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin:0}
+.size-out div{border-top:2px solid var(--lane);padding-top:12px;min-width:0}
+.size-out dt{font-family:var(--font-mono);font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--lane-soft)}
+.size-out dd{margin:6px 0 0;font-family:var(--font-display);font-weight:900;font-size:clamp(2.8rem,6.4vw,4.8rem);line-height:1;font-variant-numeric:tabular-nums}
+.size-out dd span{display:inline-block}
+.note{font-size:1rem;color:var(--lane-soft);max-width:34rem}
+
+/* Specs */
+.table-scroll{overflow-x:auto;border-top:3px solid var(--ink)}
+.specs-table{width:100%;min-width:760px;border-collapse:collapse;font-family:var(--font-mono);font-size:.92rem;font-variant-numeric:tabular-nums;color:var(--ink)}
+.specs-table th,.specs-table td{text-align:left;padding:16px 18px 16px 0;border-bottom:1px solid var(--rule);vertical-align:baseline}
+.specs-table thead th{font-weight:500;font-size:.7rem;letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft)}
+.specs-table tbody th{font-family:var(--font-display);font-weight:900;font-size:1.7rem;line-height:1}
+.specs-table tbody tr{transition:background-color .2s ease}
+.specs-table tbody tr:hover{background:var(--lane)}
+.table-note{margin-top:16px;font-size:.92rem;color:var(--ink-soft)}
+
+/* Last call */
+.cta-inner{display:grid;gap:18px;max-width:52rem}
+.cta h2{font-size:clamp(3.6rem,10vw,9rem)}
+.cta .btn-white{box-shadow:5px 5px 0 var(--track-deep)}
+.cta .btn-white:hover{box-shadow:7px 7px 0 var(--track-deep)}
+
+/* Footer */
+.footer{background:var(--ink);color:var(--lane-soft);padding-block:48px calc(40px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--ink-2)}
+.foot-grid{display:flex;flex-wrap:wrap;align-items:center;gap:20px 36px}
+.foot-grid nav{display:flex;flex-wrap:wrap;gap:22px}
+.foot-grid nav a{text-decoration:none;font-weight:600}
+.foot-grid nav a:hover{color:var(--lane)}
+.foot-grid p{margin-left:auto;font-size:.9rem}
+@media (max-width:640px){.foot-grid p{margin-left:0;width:100%}}
+
+/* Gun */
+.flash{position:fixed;inset:0;z-index:70;background:var(--lane);opacity:0;pointer-events:none}
+.fx-layer{position:fixed;inset:0;z-index:71;pointer-events:none;overflow:hidden}
+.react{position:absolute;left:0;top:0;font-family:var(--font-mono);font-weight:600;font-size:.9rem;white-space:nowrap;padding:9px 12px;background:var(--ink);color:var(--lane);border-radius:2px;box-shadow:4px 4px 0 var(--track)}
+
+@media (prefers-reduced-motion: reduce){
+  .scroll-hint i{animation:none}
+  .shot img,.shot svg{transition:none}
+}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="mark" viewBox="0 0 100 60"><path d="M18 9 L100 30 L18 51 L34 30 Z"/><path d="M0 21 H13 V39 H0 Z"/></symbol>
+</svg>
+
+<header class="nav" id="nav">
+  <div class="nav-inner">
+    <a class="brand" href="#top" aria-label="Spiker, back to top"><svg aria-hidden="true"><use href="#mark"/></svg><span>SPIKER</span></a>
+    <nav class="nav-links" aria-label="Sections">
+      <a href="#anatomy">Anatomy</a>
+      <a href="#range">Range</a>
+      <a href="#fit">Fit</a>
+      <a href="#specs">Specs</a>
+    </nav>
+    <button class="btn btn-white btn-sm js-gun" type="button">Fire the gun</button>
+  </div>
+</header>
+
+<main id="top">
+  <section class="stage" id="stage" aria-label="Spiker SP-1">
+    <canvas class="lanes" id="lanes" aria-hidden="true"></canvas>
+    <div class="mega" aria-hidden="true"><span>SPIKER</span></div>
+    <div class="shoe-wrap" id="shoeWrap" aria-hidden="true">
+      <canvas id="shoe3d"></canvas>
+      <div class="shoe-fallback" id="shoeFallback" hidden></div>
+    </div>
+    <div class="callouts" id="callouts" aria-hidden="true">
+      <div class="callout"><i class="leader"></i><i class="dot"></i><span class="tag">Engineered knit upper</span></div>
+      <div class="callout"><i class="leader"></i><i class="dot"></i><span class="tag">Asymmetric lacing</span></div>
+      <div class="callout"><i class="leader"></i><i class="dot"></i><span class="tag">Carbon plate, 1.2 mm</span></div>
+      <div class="callout"><i class="leader"></i><i class="dot"></i><span class="tag">13 mm heel, 4 mm drop</span></div>
+      <div class="callout"><i class="leader"></i><i class="dot"></i><span class="tag">7 × 7 mm pyramid pins</span></div>
+      <div class="callout"><i class="leader"></i><i class="dot"></i><span class="tag">Plate ends at the midfoot</span></div>
+      <div class="callout"><i class="leader"></i><i class="dot"></i><span class="tag">Toe spring for the drive phase</span></div>
+    </div>
+    <div class="clock" aria-hidden="true"><span class="clock-label">Race clock</span><span class="clock-time" id="clock">0.00</span></div>
+    <div class="stage-panels">
+      <div class="panel p1">
+        <p class="eyebrow">Spiker SP-1 · Sprint spike</p>
+        <h1>First off the line.</h1>
+        <p class="lede">A 148 g sprint spike with a carbon plate and seven 7 mm pins, built for the first 30 metres.</p>
+        <div class="actions">
+          <button class="btn btn-white js-gun" type="button">Fire the gun</button>
+          <a class="btn btn-line" href="#specs">See the specs</a>
+        </div>
+        <div class="colorways" role="group" aria-label="Colorway">
+          <span class="cw-label">Colorway</span>
+          <button class="swatch" type="button" data-cw="cobalt" aria-pressed="true" aria-label="Cobalt" style="--sw:#2B50E8"></button>
+          <button class="swatch" type="button" data-cw="tartan" aria-pressed="false" aria-label="Tartan" style="--sw:#C73E25"></button>
+          <button class="swatch" type="button" data-cw="ghost" aria-pressed="false" aria-label="Ghost" style="--sw:#E6E6E1"></button>
+          <span class="cw-name" id="cwName" aria-live="polite">Cobalt</span>
+        </div>
+      </div>
+      <div class="panel p2" id="anatomy">
+        <p class="eyebrow">Exploded view</p>
+        <h2>Every gram earns its place.</h2>
+        <p class="lede">Pull an SP-1 apart and you find three layers: a knit upper, a thin foam heel and a carbon spike plate. Nothing else made the cut.</p>
+        <ul class="facts-inline"><li><b>148</b> grams</li><li><b>3</b> layers</li><li><b>4</b> mm drop</li></ul>
+      </div>
+      <div class="panel p3">
+        <p class="eyebrow">Spike plate</p>
+        <h2>Seven pins. Zero slip.</h2>
+        <p class="lede">Seven 7 mm pyramid pins sit under the ball of your foot, where you push hardest out of the blocks. The plate is stiff enough to hand that push back.</p>
+        <ul class="facts-inline"><li><b>7</b> pins</li><li><b>7</b> mm each</li><li><b>1.2</b> mm plate</li></ul>
+      </div>
+    </div>
+    <div class="scroll-hint" aria-hidden="true"><span>Scroll to take it apart</span><i></i></div>
+  </section>
+
+  <div class="startline" aria-hidden="true">
+    <div class="startline-track">
+      <div class="lane-cell"><small>LANE</small>1</div><div class="lane-cell"><small>LANE</small>2</div><div class="lane-cell"><small>LANE</small>3</div><div class="lane-cell"><small>LANE</small>4</div>
+      <div class="lane-cell"><small>LANE</small>5</div><div class="lane-cell"><small>LANE</small>6</div><div class="lane-cell"><small>LANE</small>7</div><div class="lane-cell"><small>LANE</small>8</div>
+      <div class="lane-cell"><small>LANE</small>1</div><div class="lane-cell"><small>LANE</small>2</div><div class="lane-cell"><small>LANE</small>3</div><div class="lane-cell"><small>LANE</small>4</div>
+      <div class="lane-cell"><small>LANE</small>5</div><div class="lane-cell"><small>LANE</small>6</div><div class="lane-cell"><small>LANE</small>7</div><div class="lane-cell"><small>LANE</small>8</div>
+    </div>
+  </div>
+
+  <section class="band band-light" id="range">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">The range</p>
+        <h2>Three shoes. Three distances.</h2>
+        <p class="lede">Pick by the race you run. The pins, plate and foam change with the distance.</p>
+      </div>
+      <div class="range-grid">
+        <article class="model">
+          <div class="shot" data-model="sp1"></div>
+          <div class="model-meta"><b>SP-1</b><span>100–400 m</span></div>
+          <h3>Sprint</h3>
+          <p>Our lightest spike. Carbon plate and seven pins for block starts and the bend.</p>
+          <dl class="model-specs"><div><dt>Weight</dt><dd>148 g</dd></div><div><dt>Pins</dt><dd>7</dd></div><div><dt>Drop</dt><dd>4 mm</dd></div></dl>
+        </article>
+        <article class="model">
+          <div class="shot" data-model="md8"></div>
+          <div class="model-meta"><b>MD-8</b><span>800–1500 m</span></div>
+          <h3>Middle</h3>
+          <p>More foam under the heel and a flexible nylon plate for races that last a few laps.</p>
+          <dl class="model-specs"><div><dt>Weight</dt><dd>172 g</dd></div><div><dt>Pins</dt><dd>6</dd></div><div><dt>Drop</dt><dd>5 mm</dd></div></dl>
+        </article>
+        <article class="model">
+          <div class="shot" data-model="tr1"></div>
+          <div class="model-meta"><b>TR-1</b><span>Daily training</span></div>
+          <h3>Trainer</h3>
+          <p>No pins, 38 mm of foam and a wider base for the miles between race days.</p>
+          <dl class="model-specs"><div><dt>Weight</dt><dd>245 g</dd></div><div><dt>Pins</dt><dd>0</dd></div><div><dt>Drop</dt><dd>8 mm</dd></div></dl>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section class="band band-ink" id="fit">
+    <div class="wrap fit-grid">
+      <div class="section-head">
+        <p class="eyebrow">Fit</p>
+        <h2>Find your size.</h2>
+        <p class="lede">Spikes should fit snug with no gap at the toe. Pick your usual US men's size to see the rest.</p>
+      </div>
+      <div class="sizer">
+        <p class="size-label" id="sizeLabel">US men's size</p>
+        <div class="size-chips" role="group" aria-labelledby="sizeLabel">
+          <button class="size-chip" type="button" data-us="6" aria-pressed="false">6</button>
+          <button class="size-chip" type="button" data-us="6.5" aria-pressed="false">6.5</button>
+          <button class="size-chip" type="button" data-us="7" aria-pressed="false">7</button>
+          <button class="size-chip" type="button" data-us="7.5" aria-pressed="false">7.5</button>
+          <button class="size-chip" type="button" data-us="8" aria-pressed="false">8</button>
+          <button class="size-chip" type="button" data-us="8.5" aria-pressed="false">8.5</button>
+          <button class="size-chip" type="button" data-us="9" aria-pressed="true">9</button>
+          <button class="size-chip" type="button" data-us="9.5" aria-pressed="false">9.5</button>
+          <button class="size-chip" type="button" data-us="10" aria-pressed="false">10</button>
+          <button class="size-chip" type="button" data-us="10.5" aria-pressed="false">10.5</button>
+          <button class="size-chip" type="button" data-us="11" aria-pressed="false">11</button>
+          <button class="size-chip" type="button" data-us="11.5" aria-pressed="false">11.5</button>
+          <button class="size-chip" type="button" data-us="12" aria-pressed="false">12</button>
+          <button class="size-chip" type="button" data-us="13" aria-pressed="false">13</button>
+        </div>
+        <dl class="size-out" aria-live="polite">
+          <div><dt>UK</dt><dd><span id="szUK">8</span></dd></div>
+          <div><dt>EU</dt><dd><span id="szEU">42.5</span></dd></div>
+          <div><dt>Foot length</dt><dd><span id="szCM">27</span> <small style="font-size:.4em">cm</small></dd></div>
+        </dl>
+        <p class="note">Between two sizes? Spikes sit close to the foot, so take the larger one.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="band band-light" id="specs">
+    <div class="wrap">
+      <div class="section-head">
+        <p class="eyebrow">Spec sheet</p>
+        <h2>The numbers.</h2>
+      </div>
+      <div class="table-scroll">
+        <table class="specs-table">
+          <thead>
+            <tr><th scope="col">Model</th><th scope="col">Distance</th><th scope="col">Weight</th><th scope="col">Plate</th><th scope="col">Pins</th><th scope="col">Heel / forefoot</th><th scope="col">Drop</th></tr>
+          </thead>
+          <tbody>
+            <tr><th scope="row">SP-1</th><td>100–400 m</td><td>148 g</td><td>Carbon, 1.2 mm</td><td>7 × 7 mm</td><td>13 / 9 mm</td><td>4 mm</td></tr>
+            <tr><th scope="row">MD-8</th><td>800–1500 m</td><td>172 g</td><td>Nylon, 1.6 mm</td><td>6 × 7 mm</td><td>18 / 13 mm</td><td>5 mm</td></tr>
+            <tr><th scope="row">TR-1</th><td>Daily training</td><td>245 g</td><td>None</td><td>None</td><td>38 / 30 mm</td><td>8 mm</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="table-note">Weights are for a US men's 9. Stack heights are measured at the heel and under the ball of the foot.</p>
+    </div>
+  </section>
+
+  <section class="band band-track cta" id="line">
+    <div class="wrap cta-inner">
+      <p class="eyebrow">Lane 4 · On your marks</p>
+      <h2>See you at the line.</h2>
+      <p class="lede">The SP-1 comes in Tartan, Cobalt and Ghost, in US men's sizes 6 to 13.</p>
+      <div class="actions"><button class="btn btn-white js-gun" type="button">Fire the gun</button><a class="btn btn-line" href="#top">Back to the start</a></div>
+    </div>
+  </section>
+</main>
+
+<footer class="footer">
+  <div class="wrap foot-grid">
+    <a class="brand" href="#top" aria-label="Spiker, back to top"><svg aria-hidden="true"><use href="#mark"/></svg><span>SPIKER</span></a>
+    <nav aria-label="Footer"><a href="#range">Range</a><a href="#fit">Fit</a><a href="#specs">Specs</a></nav>
+    <p>© 2026 Spiker. Built for the track.</p>
+  </div>
+</footer>
+
+<div class="flash" aria-hidden="true"></div>
+<div class="fx-layer" aria-hidden="true"></div>
+
+<script>
+(function () {
+  "use strict";
+  var root = document.documentElement;
+  var motion = root.classList.contains("motion");
+  var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  var hasGsap = !!(window.gsap && window.ScrollTrigger);
+  var stage = document.getElementById("stage");
+  var mqNarrow = window.matchMedia("(max-width: 760px)");
+
+  var COLORWAYS = {
+    tartan: { name: "Tartan", upper: "#C73E25", upperDark: "#962A15", lining: "#1A1B22", accent: "#FFFFFF", lace: "#F4F4F1", sole: "#F2F2EE", plate: "#17181F" },
+    cobalt: { name: "Cobalt", upper: "#2B50E8", upperDark: "#1B34A6", lining: "#14151B", accent: "#F05436", lace: "#F4F4F1", sole: "#F2F2EE", plate: "#14151B" },
+    ghost:  { name: "Ghost",  upper: "#E4E4DF", upperDark: "#C3C3BB", lining: "#2A2B33", accent: "#C73E25", lace: "#17181F", sole: "#1B1C23", plate: "#C73E25" }
+  };
+
+  var S = window.SPIKER = {
+    motion: motion, reduce: reduce, COLORWAYS: COLORWAYS,
+    state: { fx: 0.38, rotX: 0.28, rotY: -0.55, rotZ: 0.1, scale: 1, explode: 0 },
+    mouse: { x: 0, y: 0 },
+    lanes: { speed: 1, boost: 0 },
+    dashX: 0, spin: 0,
+    callA: { a: 0 }, callB: { a: 0 },
+    CALLOUTS: [
+      { g: "A", dx: 80, dy: -120 },
+      { g: "A", dx: -30, dy: -150 },
+      { g: "A", dx: 90, dy: 110 },
+      { g: "A", dx: 30, dy: 140 },
+      { g: "B", dx: 30, dy: 150 },
+      { g: "B", dx: -50, dy: 120 },
+      { g: "B", dx: -40, dy: -150 }
+    ],
+    colorway: "cobalt",
+    stageVisible: true,
+    ready3d: false
+  };
+
+  /* ---------- Art: the logo mark, upper texture, knit and twill ---------- */
+  function drawMark(x, cx, cy, w, h, color) {
+    x.save(); x.translate(cx - w / 2, cy - h / 2); x.scale(w / 100, h / 60); x.fillStyle = color;
+    x.beginPath(); x.moveTo(18, 9); x.lineTo(100, 30); x.lineTo(18, 51); x.lineTo(34, 30); x.closePath(); x.fill();
+    x.fillRect(0, 21, 13, 18);
+    x.restore();
+  }
+  function rng(seed) {
+    return function () {
+      seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
+      var t = Math.imul(seed ^ (seed >>> 15), 1 | seed);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  /* The upper's UVs run heel-to-toe (x) and lateral-bottom, over the top, to medial-bottom (y). */
+  S.drawUpper = function (cw, W, H, canvas) {
+    var c = canvas || document.createElement("canvas"); c.width = W; c.height = H;
+    var x = c.getContext("2d"), k = W / 2048, i, j;
+    x.fillStyle = cw.upper; x.fillRect(0, 0, W, H);
+    x.fillStyle = cw.upperDark; x.globalAlpha = 0.16;
+    for (i = 0; i < H; i += 7 * k) x.fillRect(0, i, W, 2 * k);
+    x.globalAlpha = 0.22;
+    for (i = W * 0.58; i < W * 0.9; i += 16 * k) for (j = H * 0.2; j < H * 0.8; j += 16 * k) { x.beginPath(); x.arc(i, j, 3 * k, 0, 6.283); x.fill(); }
+    x.globalAlpha = 1;
+    // heel counter and toe cap
+    x.fillStyle = cw.upperDark;
+    x.beginPath(); x.moveTo(0, 0); x.lineTo(W * 0.1, 0); x.quadraticCurveTo(W * 0.15, H * 0.5, W * 0.1, H); x.lineTo(0, H); x.closePath(); x.fill();
+    x.beginPath(); x.moveTo(W, 0); x.lineTo(W * 0.9, 0); x.quadraticCurveTo(W * 0.86, H * 0.5, W * 0.9, H); x.lineTo(W, H); x.closePath(); x.fill();
+    // eyestay and eyelets
+    x.fillStyle = cw.upperDark;
+    x.fillRect(W * 0.38, H * 0.36, W * 0.36, H * 0.05); x.fillRect(W * 0.38, H * 0.59, W * 0.36, H * 0.05);
+    x.fillStyle = cw.lining;
+    for (i = 0; i < 6; i++) { var ex = W * (0.41 + i * 0.062); x.beginPath(); x.arc(ex, H * 0.385, 9 * k, 0, 6.283); x.fill(); x.beginPath(); x.arc(ex, H * 0.615, 9 * k, 0, 6.283); x.fill(); }
+    // foot opening (lining)
+    x.fillStyle = cw.lining; x.beginPath(); x.ellipse(W * 0.235, H * 0.5, W * 0.15, H * 0.17, 0, 0, 6.283); x.fill();
+    x.strokeStyle = cw.upperDark; x.lineWidth = 22 * k; x.beginPath(); x.ellipse(W * 0.235, H * 0.5, W * 0.155, H * 0.18, 0, 0, 6.283); x.stroke();
+    // logo mark on both sides (the mark is symmetric top-to-bottom, so it points at the toe on both)
+    drawMark(x, W * 0.6, H * 0.19, W * 0.27, H * 0.13, cw.accent);
+    drawMark(x, W * 0.6, H * 0.81, W * 0.27, H * 0.13, cw.accent);
+    // heel wordmark: lateral side reads upright when flipped vertically, medial when flipped horizontally
+    x.fillStyle = cw.accent; x.font = "900 " + Math.round(44 * k) + "px 'Big Shoulders Display', Impact, sans-serif"; x.textAlign = "center"; x.textBaseline = "middle";
+    x.save(); x.translate(W * 0.16, H * 0.2); x.scale(1, -1); x.fillText("SPIKER", 0, 0); x.restore();
+    x.save(); x.translate(W * 0.16, H * 0.8); x.scale(-1, 1); x.fillText("SPIKER", 0, 0); x.restore();
+    return c;
+  };
+  S.drawKnit = function (W, H) {
+    var c = document.createElement("canvas"); c.width = W; c.height = H;
+    var x = c.getContext("2d"), R = rng(3), i;
+    x.fillStyle = "#808080"; x.fillRect(0, 0, W, H);
+    for (i = 0; i < H; i += 4) { x.fillStyle = i % 8 ? "#6a6a6a" : "#9a9a9a"; x.fillRect(0, i, W, 2); }
+    for (i = 0; i < 2500; i++) { x.fillStyle = R() > 0.5 ? "#a8a8a8" : "#5c5c5c"; x.fillRect(R() * W, R() * H, 2, 1); }
+    return c;
+  };
+  S.drawTwill = function (n) {
+    var c = document.createElement("canvas"); c.width = n; c.height = n;
+    var x = c.getContext("2d"), s = n / 8, i, j;
+    x.fillStyle = "#555"; x.fillRect(0, 0, n, n);
+    for (i = 0; i < 8; i++) for (j = 0; j < 8; j++) {
+      x.fillStyle = (i + j) % 2 ? "#9a9a9a" : "#3a3a3a";
+      x.beginPath(); x.moveTo(i * s, j * s); x.lineTo(i * s + s, j * s + s * 0.2); x.lineTo(i * s + s, j * s + s); x.lineTo(i * s, j * s + s * 0.8); x.closePath(); x.fill();
+    }
+    return c;
+  };
+
+  /* ---------- Flat fallback shoe (used if WebGL is unavailable) ---------- */
+  function shoeSVG(cw, pins) {
+    var p = "", xs = [196, 226, 256, 284, 306].slice(0, pins === 0 ? 0 : 5);
+    xs.forEach(function (px) { p += '<path d="M' + px + ' 129 l6 11 l6 -11 Z" fill="#9AA1A8"/>'; });
+    var laces = "";
+    for (var i = 0; i < 5; i++) { var lx = 142 + i * 16; laces += '<path d="M' + lx + ' ' + (34 + i * 5) + ' l10 6" stroke="' + cw.lace + '" stroke-width="4" stroke-linecap="round"/>'; }
+    return '<svg viewBox="0 0 340 150" aria-hidden="true">' +
+      '<path d="M18 106 C10 86 14 56 30 40 C44 35 62 42 76 50 C96 46 112 31 132 29 C158 35 214 64 262 78 C298 88 318 96 322 108 L322 112 L22 112 Z" fill="' + cw.upper + '"/>' +
+      '<path d="M38 46 C52 39 66 43 78 51 C68 57 50 56 38 46 Z" fill="' + cw.lining + '"/>' +
+      laces +
+      '<path d="M160 72 L252 88 L160 104 L176 88 Z" fill="' + cw.accent + '"/><path d="M140 82 H153 V94 H140 Z" fill="' + cw.accent + '"/>' +
+      '<path d="M16 110 L326 110 C332 114 330 124 318 126 L34 126 C20 126 12 120 16 110 Z" fill="' + cw.sole + '"/>' +
+      (pins === 0 ? "" : '<path d="M176 125 L318 121 C324 125 320 131 310 131 L182 131 Z" fill="' + cw.plate + '"/>') + p + "</svg>";
+  }
+  S.shoeSVG = shoeSVG;
+  var SHOTS = { sp1: ["tartan", 7], md8: ["cobalt", 6], tr1: ["ghost", 0] };
+  document.querySelectorAll(".shot[data-model]").forEach(function (el) {
+    var m = SHOTS[el.getAttribute("data-model")];
+    el.innerHTML = shoeSVG(COLORWAYS[m[0]], m[1]);
+  });
+  S.setShot = function (id, url, alt) {
+    var el = document.querySelector('.shot[data-model="' + id + '"]');
+    if (!el) return;
+    var img = new Image(); img.alt = alt; img.src = url; img.width = 720; img.height = 380;
+    el.innerHTML = ""; el.appendChild(img);
+  };
+
+  /* ---------- Fonts (the upper texture draws text) ---------- */
+  var loads = [];
+  try { loads = ["900 44px 'Big Shoulders Display'", "500 16px 'IBM Plex Mono'"].map(function (f) { return document.fonts.load(f); }); } catch (e) {}
+  S.fontsReady = Promise.race([Promise.all(loads), new Promise(function (r) { setTimeout(r, 3000); })]).catch(function () {});
+  S.fontsReady.then(function () { if (hasGsap) ScrollTrigger.refresh(); });
+
+  /* ---------- Track lanes ---------- */
+  var lc = document.getElementById("lanes"), lx = lc.getContext("2d");
+  var LW = 0, LH = 0, phase = 0;
+  var laneColor = getComputedStyle(root).getPropertyValue("--lane").trim() || "#FFFFFF";
+  function sizeLanes() {
+    var r = lc.getBoundingClientRect(), d = Math.min(window.devicePixelRatio || 1, 1.5);
+    LW = r.width; LH = r.height; lc.width = Math.round(LW * d); lc.height = Math.round(LH * d);
+    lx.setTransform(d, 0, 0, d, 0, 0); drawLanes(0);
+  }
+  function drawLanes(dt) {
+    if (!LW) return;
+    lx.clearRect(0, 0, LW, LH);
+    var narrow = LW < 761, vx = LW * (narrow ? 0.5 : 0.6), vy = LH * 0.3;
+    var spread = LW * (narrow ? 3.4 : 2.1), bx0 = vx - spread / 2, t0 = 0.04, n = 8, i, k;
+    lx.strokeStyle = laneColor; lx.globalAlpha = 0.26; lx.lineWidth = 2;
+    for (i = 0; i <= n; i++) {
+      var bx = bx0 + (spread * i) / n;
+      lx.beginPath(); lx.moveTo(vx + (bx - vx) * t0, vy + (LH - vy) * t0); lx.lineTo(bx, LH); lx.stroke();
+    }
+    phase = (phase + dt * (S.lanes.speed + S.lanes.boost) * 0.7) % 1;
+    for (k = 0; k < 16; k++) {
+      var dd = k + 1 - phase, t = 0.95 / dd;
+      if (t < t0 || t > 1.05) continue;
+      var y = vy + (LH - vy) * t;
+      lx.globalAlpha = Math.min(1, (t - t0) * 4) * 0.42; lx.lineWidth = Math.max(1, 5 * t);
+      for (i = 0; i < n; i++) {
+        var a = vx + (bx0 + (spread * i) / n - vx) * t, b = vx + (bx0 + (spread * (i + 1)) / n - vx) * t;
+        lx.beginPath(); lx.moveTo(a + (b - a) * 0.3, y); lx.lineTo(a + (b - a) * 0.7, y); lx.stroke();
+      }
+    }
+    lx.globalAlpha = 1;
+  }
+  sizeLanes();
+  window.addEventListener("resize", sizeLanes);
+  var lastT = performance.now();
+  function tickLanes() {
+    var now = performance.now(), dt = Math.min((now - lastT) / 1000, 0.05); lastT = now;
+    if (!reduce && S.stageVisible) drawLanes(dt);
+  }
+
+  /* ---------- Race clock ---------- */
+  var clockEl = document.getElementById("clock");
+  var clock = { start: performance.now(), stop: 9.97, running: !reduce };
+  if (reduce) clockEl.textContent = clock.stop.toFixed(2);
+  function tickClock() {
+    if (!clock.running) return;
+    var t = (performance.now() - clock.start) / 1000;
+    if (t >= clock.stop) { t = clock.stop; clock.running = false; }
+    clockEl.textContent = t.toFixed(2);
+  }
+  function frame() { tickLanes(); tickClock(); }
+  if (hasGsap) gsap.ticker.add(frame); else (function loop() { frame(); requestAnimationFrame(loop); })();
+
+  if ("IntersectionObserver" in window) {
+    new IntersectionObserver(function (es) { S.stageVisible = es[0].isIntersecting; }, { rootMargin: "120px" }).observe(stage);
+  }
+  stage.addEventListener("pointermove", function (e) {
+    if (e.pointerType !== "mouse") return;
+    var r = stage.getBoundingClientRect();
+    S.mouse.x = ((e.clientX - r.left) / r.width) * 2 - 1;
+    S.mouse.y = ((e.clientY - r.top) / r.height) * 2 - 1;
+  });
+  stage.addEventListener("pointerleave", function () { S.mouse.x = 0; S.mouse.y = 0; });
+
+  /* ---------- Colorways ---------- */
+  var cwName = document.getElementById("cwName");
+  document.querySelectorAll(".swatch").forEach(function (b) {
+    b.addEventListener("click", function () {
+      var key = b.getAttribute("data-cw");
+      if (key === S.colorway) return;
+      S.colorway = key;
+      document.querySelectorAll(".swatch").forEach(function (o) { o.setAttribute("aria-pressed", String(o === b)); });
+      cwName.textContent = COLORWAYS[key].name;
+      if (S.applyColorway) S.applyColorway(key);
+      if (S.fallbackOn) document.getElementById("shoeFallback").innerHTML = shoeSVG(COLORWAYS[key], 7);
+    });
+  });
+
+  /* ---------- Fallback when WebGL is unavailable ---------- */
+  S.useFallback = function () {
+    if (S.fallbackOn || S.ready3d) return;
+    S.fallbackOn = true;
+    var fb = document.getElementById("shoeFallback"), wrap = document.getElementById("shoeWrap");
+    fb.innerHTML = shoeSVG(COLORWAYS[S.colorway], 7); fb.hidden = false;
+    function apply() {
+      if (S.ready3d) return;
+      var w = wrap.clientWidth, h = wrap.clientHeight, narrow = mqNarrow.matches;
+      var fx = motion && !narrow ? S.state.fx : 0, fy = motion && narrow ? -0.18 : 0;
+      fb.style.transform = "translate(-50%,-50%) translate(" + (fx * w / 2 + S.dashX * w * 0.8) + "px," + fy * h + "px) rotate(" + (-S.state.rotZ) + "rad) scale(" + (motion && narrow ? 0.8 : 1) * S.state.scale + ")";
+    }
+    if (hasGsap) gsap.ticker.add(apply); else apply();
+  };
+  setTimeout(function () { if (!S.ready3d) S.useFallback(); }, 8000);
+
+  /* ---------- Fire the gun ---------- */
+  var flash = document.querySelector(".flash"), fx = document.querySelector(".fx-layer");
+  function fireGun(e) {
+    var r = e.currentTarget.getBoundingClientRect();
+    var react = (0.118 + Math.random() * 0.05).toFixed(3);
+    clock.start = performance.now(); clock.stop = 9.84 + Math.random() * 0.42; clock.running = !reduce;
+    if (reduce) clockEl.textContent = clock.stop.toFixed(2);
+    if (!hasGsap) return;
+    var pill = document.createElement("span"); pill.className = "react"; pill.textContent = "Reaction " + react + " s"; fx.appendChild(pill);
+    var x = r.left + r.width / 2, y = r.top - 12;
+    if (reduce) {
+      gsap.fromTo(pill, { x: x, y: y, xPercent: -50, yPercent: -100, opacity: 0 }, { opacity: 1, duration: 0.2, yoyo: true, repeat: 1, repeatDelay: 1.2, onComplete: function () { pill.remove(); } });
+      return;
+    }
+    gsap.fromTo(flash, { opacity: 0.5 }, { opacity: 0, duration: 0.5, ease: "power2.out" });
+    gsap.fromTo(pill, { x: x, y: y + 20, xPercent: -50, yPercent: -100, scale: 0.6 }, { y: y, scale: 1, duration: 0.45, ease: "back.out(2.5)" });
+    gsap.to(pill, { opacity: 0, y: y - 30, duration: 0.4, delay: 1.4, onComplete: function () { pill.remove(); } });
+    gsap.fromTo(S.lanes, { boost: 14 }, { boost: 0, duration: 1.8, ease: "power2.out" });
+    if (S.stageVisible) {
+      gsap.timeline()
+        .to(S, { dashX: 1.2, duration: 0.36, ease: "power3.in" })
+        .set(S, { dashX: -1.2 })
+        .to(S, { dashX: 0, duration: 0.8, ease: "power3.out" });
+    }
+  }
+  document.querySelectorAll(".js-gun").forEach(function (b) { b.addEventListener("click", fireGun); });
+
+  /* ---------- Size finder ---------- */
+  var SIZES = { "6": [5.5, 38.5, 24], "6.5": [6, 39, 24.5], "7": [6, 40, 25], "7.5": [6.5, 40.5, 25.5], "8": [7, 41, 26], "8.5": [7.5, 42, 26.5], "9": [8, 42.5, 27], "9.5": [8.5, 43, 27.5], "10": [9, 44, 28], "10.5": [9.5, 44.5, 28.5], "11": [10, 45, 29], "11.5": [10.5, 45.5, 29.5], "12": [11, 46, 30], "13": [12, 47.5, 31] };
+  var outs = [document.getElementById("szUK"), document.getElementById("szEU"), document.getElementById("szCM")];
+  document.querySelectorAll(".size-chip").forEach(function (b) {
+    b.addEventListener("click", function () {
+      var v = SIZES[b.getAttribute("data-us")];
+      document.querySelectorAll(".size-chip").forEach(function (o) { o.setAttribute("aria-pressed", String(o === b)); });
+      outs.forEach(function (el, i) { el.textContent = String(v[i]); });
+      if (hasGsap && !reduce) gsap.fromTo(outs, { yPercent: 45, rotationX: -60 }, { yPercent: 0, rotationX: 0, duration: 0.45, ease: "back.out(2)", stagger: 0.05 });
+    });
+  });
+
+  /* ---------- Smooth scroll + anchors ---------- */
+  var lenis = null;
+  if (motion && window.Lenis) {
+    lenis = new Lenis({ lerp: 0.1 });
+    lenis.on("scroll", ScrollTrigger.update);
+    gsap.ticker.add(function (t) { lenis.raf(t * 1000); });
+    gsap.ticker.lagSmoothing(0);
+  }
+  document.querySelectorAll('a[href^="#"]').forEach(function (a) {
+    a.addEventListener("click", function (e) {
+      var id = a.getAttribute("href"), target;
+      if (id === "#top") target = 0;
+      else if (id === "#anatomy" && S.stageST) target = S.stageST.start + (S.stageST.end - S.stageST.start) * 0.42;
+      else target = document.querySelector(id);
+      if (target === null || target === undefined) return;
+      e.preventDefault();
+      if (lenis) lenis.scrollTo(target, { offset: typeof target === "number" ? 0 : -60, duration: 1.4 });
+      else if (typeof target === "number") window.scrollTo({ top: target, behavior: reduce ? "auto" : "smooth" });
+      else target.scrollIntoView({ behavior: reduce ? "auto" : "smooth" });
+    });
+  });
+  var nav = document.getElementById("nav");
+  function navState() { nav.classList.toggle("is-solid", window.scrollY > 40); }
+  window.addEventListener("scroll", navState, { passive: true }); navState();
+
+  if (!hasGsap) return;
+  gsap.registerPlugin(ScrollTrigger);
+  ScrollTrigger.config({ ignoreMobileResize: true });
+
+  /* ---------- Scroll story: hero, exploded view, sole view ---------- */
+  if (motion) {
+    var mm = gsap.matchMedia();
+    mm.add({ wide: "(min-width: 761px)", narrow: "(max-width: 760px)" }, function (ctx) {
+      var wide = ctx.conditions.wide, dx = wide ? 70 : 0;
+      gsap.set(S.state, { fx: 0.38, rotX: 0.28, rotY: -0.55, rotZ: 0.1, scale: 1, explode: 0 });
+      gsap.set([S.callA, S.callB], { a: 0 });
+      gsap.set(S.lanes, { speed: 1 });
+      var tl = gsap.timeline({
+        defaults: { ease: "power1.inOut" },
+        scrollTrigger: { trigger: stage, start: "top top", end: "+=260%", pin: true, scrub: 0.9, anticipatePin: 1 }
+      });
+      S.stageST = tl.scrollTrigger;
+      tl.to(S.state, { fx: 0.26, rotX: 0.05, rotY: 0, rotZ: 0, explode: 1, scale: 0.94, duration: 1 }, 0)
+        .to(".p1", { autoAlpha: 0, y: -40, duration: 0.3, ease: "power1.in" }, 0.05)
+        .fromTo(".p2", { autoAlpha: 0, y: 50 }, { autoAlpha: 1, y: 0, duration: 0.35, ease: "power2.out" }, 0.6)
+        .to(S.callA, { a: 1, duration: 0.25 }, 0.72)
+        .to(S.callA, { a: 0, duration: 0.18 }, 1.0)
+        .to(S.state, { fx: -0.26, rotX: -Math.PI / 2 + 0.14, rotY: 0, rotZ: 0, explode: 0.35, scale: 1, duration: 1 }, 1)
+        .to(".p2", { autoAlpha: 0, x: -dx, y: wide ? 0 : -30, duration: 0.3, ease: "power1.in" }, 1.05)
+        .fromTo(".p3", { autoAlpha: 0, x: dx, y: wide ? 0 : 40 }, { autoAlpha: 1, x: 0, y: 0, duration: 0.35, ease: "power2.out" }, 1.6)
+        .to(S.callB, { a: 1, duration: 0.25 }, 1.72)
+        .to(S.lanes, { speed: 3, duration: 2.35, ease: "none" }, 0)
+        .to(".mega span", { xPercent: -16, duration: 2.35, ease: "none" }, 0)
+        .to(".scroll-hint", { autoAlpha: 0, duration: 0.12 }, 0)
+        .to({}, { duration: 0.35 }, 2);
+    });
+  }
+
+  if (reduce) return;
+
+  /* ---------- Start line, range, fit, specs ---------- */
+  gsap.fromTo(".startline-track", { xPercent: 0 }, { xPercent: -30, ease: "none", scrollTrigger: { trigger: ".startline", start: "top bottom", end: "bottom top", scrub: true } });
+  gsap.from(".model", { y: 90, duration: 1, ease: "power3.out", stagger: 0.12, scrollTrigger: { trigger: ".range-grid", start: "top 82%" } });
+  gsap.from(".model .shot > *", { xPercent: -30, rotation: 8, duration: 1.2, ease: "power3.out", stagger: 0.12, scrollTrigger: { trigger: ".range-grid", start: "top 82%" } });
+  gsap.from(".size-out div", { y: 40, duration: 0.8, ease: "power3.out", stagger: 0.08, scrollTrigger: { trigger: ".sizer", start: "top 85%" } });
+  gsap.from(".specs-table tbody tr", { x: -40, duration: 0.7, ease: "power3.out", stagger: 0.08, scrollTrigger: { trigger: ".specs-table", start: "top 85%" } });
+  gsap.from(".cta h2", { y: 60, skewX: -8, duration: 0.9, ease: "power3.out", scrollTrigger: { trigger: ".cta", start: "top 75%" } });
+})();
+</script>
+
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+<script type="module">
+import * as THREE from "three";
+import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
+
+const S = window.SPIKER;
+const wrap = document.getElementById("shoeWrap");
+const canvas = document.getElementById("shoe3d");
+
+let renderer = null;
+try {
+  renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: "high-performance" });
+} catch (err) {
+  S.useFallback();
+}
+
+/* ---------- Shoe shape: profiles along the length (u = 0 heel, 1 toe) ---------- */
+function profile(points) {
+  const curve = new THREE.CatmullRomCurve3(points.map(([u, v]) => new THREE.Vector3(u, v, 0)), false, "centripetal");
+  const pts = curve.getPoints(900);
+  return (u) => {
+    if (u <= pts[0].x) return pts[0].y;
+    let lo = 0, hi = pts.length - 1;
+    if (u >= pts[hi].x) return pts[hi].y;
+    while (hi - lo > 1) { const m = (lo + hi) >> 1; if (pts[m].x < u) lo = m; else hi = m; }
+    const a = pts[lo], b = pts[hi], t = (u - a.x) / ((b.x - a.x) || 1);
+    return a.y + (b.y - a.y) * t;
+  };
+}
+const halfW = profile([[0, 0], [0.012, 0.2], [0.04, 0.32], [0.1, 0.39], [0.22, 0.41], [0.4, 0.37], [0.58, 0.44], [0.72, 0.5], [0.84, 0.48], [0.93, 0.39], [0.975, 0.25], [0.995, 0.1], [1, 0]]);
+const baseY = profile([[0, 0.27], [0.2, 0.25], [0.45, 0.2], [0.7, 0.14], [0.88, 0.16], [1, 0.26]]);
+const topY = profile([[0, 0.86], [0.04, 1.06], [0.1, 1.04], [0.2, 0.94], [0.32, 0.96], [0.42, 1.0], [0.55, 0.88], [0.7, 0.68], [0.83, 0.5], [0.94, 0.38], [1, 0.27]]);
+const soleBot = profile([[0, 0.07], [0.1, 0.03], [0.3, 0.03], [0.5, 0.05], [0.7, 0.06], [0.86, 0.09], [0.96, 0.15], [1, 0.22]]);
+const X = (u) => -1.6 + 3.2 * u;
+const sstep = (a, b, t) => { const k = Math.min(1, Math.max(0, (t - a) / (b - a))); return k * k * (3 - 2 * k); };
+function collarDip(u) { if (u < 0.06 || u > 0.4) return 0; return 0.28 * Math.pow(Math.sin(Math.PI * (u - 0.06) / 0.34), 1.2); }
+const se = (v, n) => Math.sign(v) * Math.pow(Math.abs(v), 2 / n);
+
+function upperPoint(u, v, p, stack) {
+  const hw = halfW(u), b = baseY(u) + stack, t = topY(u) + stack;
+  const th = v * Math.PI, c = Math.cos(th), s = Math.sin(th);
+  const ce = se(c, 2.6), sy = Math.pow(Math.abs(s), 2 / 2.6);
+  const y = b + (t - b) * sy - collarDip(u) * Math.pow(s, 10);
+  const z = hw * ce * (1 - 0.22 * Math.pow(sy, 4));
+  return p.set(X(u), y, z);
+}
+function solePoint(u, v, p, stack) {
+  const hw = halfW(u) * 1.07 + 0.02 * Math.sqrt(Math.sin(Math.PI * u));
+  const bot = soleBot(u), top = baseY(u) + stack + 0.025;
+  const th = v * Math.PI * 2 - Math.PI / 2;
+  return p.set(X(u), (bot + top) / 2 + ((top - bot) / 2) * se(Math.sin(th), 5), hw * se(Math.cos(th), 5));
+}
+function platePoint(t, v, p) {
+  const u = 0.47 + 0.525 * t;
+  const hw = halfW(u) * 0.97 * Math.sqrt(sstep(0, 0.28, t)) * Math.sqrt(Math.max(0, 1 - Math.pow(t, 10)));
+  const bot = soleBot(u) - 0.05, top = soleBot(u) + 0.012;
+  const th = v * Math.PI * 2 - Math.PI / 2;
+  return p.set(X(u), (bot + top) / 2 + ((top - bot) / 2) * se(Math.sin(th), 5), hw * se(Math.cos(th), 5));
+}
+function loft(N, M, fn) {
+  const pos = new Float32Array((N + 1) * (M + 1) * 3), uv = new Float32Array((N + 1) * (M + 1) * 2), idx = [];
+  const p = new THREE.Vector3();
+  for (let i = 0; i <= N; i++) {
+    const u = (1 - Math.cos(Math.PI * i / N)) / 2;
+    for (let j = 0; j <= M; j++) {
+      const v = j / M, k = i * (M + 1) + j;
+      fn(u, v, p);
+      pos[k * 3] = p.x; pos[k * 3 + 1] = p.y; pos[k * 3 + 2] = p.z;
+      uv[k * 2] = u; uv[k * 2 + 1] = v;
+    }
+  }
+  for (let i = 0; i < N; i++) for (let j = 0; j < M; j++) {
+    const a = i * (M + 1) + j, b = a + M + 1;
+    idx.push(a, b, a + 1, b, b + 1, a + 1);
+  }
+  const g = new THREE.BufferGeometry();
+  g.setIndex(idx);
+  g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+  g.setAttribute("uv", new THREE.BufferAttribute(uv, 2));
+  g.computeVertexNormals();
+  return g;
+}
+
+const PIN_LAYOUT = [[0.6, 0.55], [0.6, -0.55], [0.73, 0.62], [0.73, -0.62], [0.86, 0.55], [0.86, -0.55], [0.95, 0]];
+
+async function init() {
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 0.82;
+  renderer.setClearColor(0x000000, 0);
+
+  const scene = new THREE.Scene();
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  scene.environment = pmrem.fromScene(new RoomEnvironment(renderer), 0.04).texture;
+  const camera = new THREE.PerspectiveCamera(30, 1, 0.1, 100);
+  camera.position.set(0, 0, 12);
+  const key = new THREE.DirectionalLight(0xffffff, 1.6); key.position.set(3, 6, 6); scene.add(key);
+  const rim = new THREE.DirectionalLight(0xffd2c4, 1.4); rim.position.set(-6, 2, -5); scene.add(rim);
+  const under = new THREE.DirectionalLight(0xffffff, 0.5); under.position.set(0, -6, 3); scene.add(under);
+
+  await S.fontsReady;
+
+  const knitTex = new THREE.CanvasTexture(S.drawKnit(1024, 512)); knitTex.flipY = false;
+  const twillTex = new THREE.CanvasTexture(S.drawTwill(128)); twillTex.wrapS = twillTex.wrapT = THREE.RepeatWrapping; twillTex.repeat.set(10, 2);
+  const pinMat = new THREE.MeshStandardMaterial({ color: 0xd3d7db, metalness: 1, roughness: 0.25 });
+
+  function buildShoe(cfg, cw, texW, texH) {
+    const stack = cfg.stack || 0;
+    const tex = new THREE.CanvasTexture(S.drawUpper(cw, texW, texH));
+    tex.colorSpace = THREE.SRGBColorSpace; tex.flipY = false; tex.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+    const mats = {
+      upper: new THREE.MeshPhysicalMaterial({ map: tex, roughness: 0.85, sheen: 0.25, sheenRoughness: 0.6, sheenColor: new THREE.Color(0xdddddd), bumpMap: knitTex, bumpScale: 0.8, side: THREE.DoubleSide }),
+      sole: new THREE.MeshStandardMaterial({ color: cw.sole, roughness: 0.6 }),
+      plate: new THREE.MeshPhysicalMaterial({ color: cw.plate, roughness: 0.32, clearcoat: 1, clearcoatRoughness: 0.12, bumpMap: twillTex, bumpScale: 0.5 }),
+      lace: new THREE.MeshStandardMaterial({ color: cw.lace, roughness: 0.65 }),
+      accent: new THREE.MeshStandardMaterial({ color: cw.accent, roughness: 0.5 })
+    };
+    const root = new THREE.Group(), inner = new THREE.Group();
+    inner.position.y = -0.55 - stack * 0.5; root.add(inner);
+    const upperG = new THREE.Group(); inner.add(upperG);
+    upperG.add(new THREE.Mesh(loft(150, 72, (u, v, p) => upperPoint(u, v, p, stack)), mats.upper));
+    for (let i = 0; i < 5; i++) {
+      const u = 0.44 + i * 0.066, w = 2 * halfW(u) * 0.52;
+      const lace = new THREE.Mesh(new THREE.CapsuleGeometry(0.03, w, 4, 10), mats.lace);
+      const slope = Math.atan2(topY(u + 0.01) - topY(u - 0.01), 0.064);
+      lace.rotation.set(Math.PI / 2, i % 2 ? 0.16 : -0.16, slope, "ZYX");
+      lace.position.set(X(u), topY(u) + stack + 0.025, 0);
+      upperG.add(lace);
+    }
+    const tab = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.3, 0.16), mats.accent);
+    tab.position.set(X(0) - 0.01, topY(0.03) + stack - 0.06, 0); tab.rotation.z = 0.12; upperG.add(tab);
+
+    const sole = new THREE.Mesh(loft(150, 48, (u, v, p) => solePoint(u, v, p, stack)), mats.sole);
+    inner.add(sole);
+    const plateG = new THREE.Group(), pinsG = new THREE.Group();
+    if (cfg.plate) {
+      inner.add(plateG);
+      plateG.add(new THREE.Mesh(loft(100, 40, platePoint), mats.plate));
+      plateG.add(pinsG);
+      PIN_LAYOUT.slice(0, cfg.pins).forEach(([u, zf]) => {
+        const pin = new THREE.Mesh(new THREE.ConeGeometry(0.05, 0.15, 6), pinMat);
+        pin.rotation.x = Math.PI;
+        pin.position.set(X(u), soleBot(u) - 0.05 - 0.07, halfW(u) * zf);
+        pinsG.add(pin);
+      });
+    }
+    const anchors = [];
+    const pt = new THREE.Vector3();
+    const addAnchor = (parent, v) => { const o = new THREE.Object3D(); o.position.copy(v); parent.add(o); anchors.push(o); };
+    addAnchor(upperG, upperPoint(0.62, 0.2, pt, stack).clone());
+    addAnchor(upperG, new THREE.Vector3(X(0.53), topY(0.53) + stack + 0.05, 0));
+    addAnchor(plateG, new THREE.Vector3(X(0.8), soleBot(0.8) - 0.03, halfW(0.8) * 0.95));
+    addAnchor(inner, new THREE.Vector3(X(0.1), (soleBot(0.1) + baseY(0.1)) / 2, halfW(0.1) * 1.07));
+    const pinTip = PIN_LAYOUT[2]; addAnchor(pinsG, new THREE.Vector3(X(pinTip[0]), soleBot(pinTip[0]) - 0.2, halfW(pinTip[0]) * pinTip[1]));
+    addAnchor(plateG, new THREE.Vector3(X(0.5), soleBot(0.5) - 0.05, 0));
+    addAnchor(inner, new THREE.Vector3(X(0.985), soleBot(0.985), 0));
+
+    function setColorway(next) {
+      S.drawUpper(next, texW, texH, tex.image); tex.needsUpdate = true;
+      mats.sole.color.set(next.sole); mats.plate.color.set(next.plate); mats.lace.color.set(next.lace); mats.accent.color.set(next.accent);
+    }
+    function dispose() {
+      root.traverse((o) => { if (o.geometry) o.geometry.dispose(); });
+      Object.values(mats).forEach((m) => m.dispose()); tex.dispose();
+    }
+    return { root, upperG, plateG, pinsG, anchors, setColorway, dispose };
+  }
+
+  /* ---------- Shadow on the track ---------- */
+  const sc = document.createElement("canvas"); sc.width = sc.height = 256;
+  const sx = sc.getContext("2d"), sg = sx.createRadialGradient(128, 128, 0, 128, 128, 128);
+  sg.addColorStop(0, "rgba(0,0,0,.75)"); sg.addColorStop(0.55, "rgba(0,0,0,.28)"); sg.addColorStop(1, "rgba(0,0,0,0)");
+  sx.fillStyle = sg; sx.fillRect(0, 0, 256, 256);
+  const shadow = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(sc), transparent: true, depthWrite: false, opacity: 0.5 }));
+  shadow.rotation.x = -Math.PI / 2 + 0.5;
+  scene.add(shadow);
+
+  /* ---------- Product shots for the range cards ---------- */
+  function viewSize(aspect) { const vh = 2 * camera.position.z * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2)); return { vh, vw: vh * aspect }; }
+  const shots = [
+    { id: "sp1", cw: "tartan", cfg: { stack: 0, plate: true, pins: 7 }, alt: "SP-1 sprint spike in Tartan red" },
+    { id: "md8", cw: "cobalt", cfg: { stack: 0.07, plate: true, pins: 6 }, alt: "MD-8 middle-distance spike in Cobalt blue" },
+    { id: "tr1", cw: "ghost", cfg: { stack: 0.24, plate: false, pins: 0 }, alt: "TR-1 trainer in Ghost white" }
+  ];
+  shadow.visible = false;
+  renderer.setSize(720, 380, false); camera.aspect = 720 / 380; camera.updateProjectionMatrix();
+  for (const s of shots) {
+    const shoe = buildShoe(s.cfg, S.COLORWAYS[s.cw], 1024, 512);
+    const { vw } = viewSize(camera.aspect);
+    shoe.root.rotation.set(0.12, -0.18, 0.04);
+    shoe.root.scale.setScalar(vw * 0.8 / 3.3);
+    scene.add(shoe.root);
+    renderer.render(scene, camera);
+    S.setShot(s.id, canvas.toDataURL("image/png"), s.alt);
+    scene.remove(shoe.root); shoe.dispose();
+  }
+  shadow.visible = true;
+
+  /* ---------- The hero shoe ---------- */
+  const main = buildShoe({ stack: 0, plate: true, pins: 7 }, S.COLORWAYS[S.colorway], 2048, 1024);
+  scene.add(main.root);
+  S.applyColorway = (keyName) => {
+    const cw = S.COLORWAYS[keyName];
+    if (S.reduce || !window.gsap) { main.setColorway(cw); return; }
+    let swapped = false;
+    gsap.to(S, {
+      spin: S.spin + Math.PI * 2, duration: 1, ease: "power3.inOut", overwrite: true,
+      onUpdate() { if (!swapped && this.progress() > 0.45) { swapped = true; main.setColorway(cw); } },
+      onComplete() { S.spin = S.spin % (Math.PI * 2); if (!swapped) main.setColorway(cw); }
+    });
+  };
+
+  let W = 1, H = 1;
+  function resize() {
+    W = wrap.clientWidth || 1; H = wrap.clientHeight || 1;
+    renderer.setSize(W, H, false); camera.aspect = W / H; camera.updateProjectionMatrix();
+  }
+  new ResizeObserver(resize).observe(wrap);
+  resize();
+
+  const callEls = Array.from(document.querySelectorAll("#callouts .callout")).map((el) => ({ el, leader: el.querySelector(".leader"), tag: el.querySelector(".tag") }));
+  const mq = window.matchMedia("(max-width: 760px)");
+  const clock = new THREE.Clock();
+  const v = new THREE.Vector3();
+  let mx = 0, my = 0;
+
+  renderer.setAnimationLoop(() => {
+    clock.getDelta();
+    const t = clock.elapsedTime;
+    if (!S.stageVisible) return;
+    const st = S.state, narrow = mq.matches;
+    const { vh, vw } = viewSize(camera.aspect);
+    mx += (S.mouse.x - mx) * 0.05; my += (S.mouse.y - my) * 0.05;
+    const base = narrow ? Math.min(vw * 0.84 / 3.3, vh * 0.3 / 1.25) : Math.min(vw * 0.46 / 3.3, vh * 0.5 / 1.25);
+    const s = base * st.scale;
+    const fx = S.motion && !narrow ? st.fx : 0;
+    const fy = S.motion && narrow ? 0.3 : 0;
+    const idle = S.reduce ? 0 : Math.sin(t * 0.5) * 0.12;
+    const float = S.reduce ? 0 : Math.sin(t * 1.6) * 0.06 * (1 - st.explode * 0.5);
+    const r = main.root;
+    r.position.set(fx * vw / 2 + S.dashX * vw * 0.8, fy * vh / 2 + float, 0);
+    r.rotation.set(st.rotX + my * 0.08, st.rotY + mx * 0.35 + idle + S.spin, st.rotZ);
+    r.scale.setScalar(s);
+    main.upperG.position.y = 0.6 * st.explode;
+    main.plateG.position.y = -0.5 * st.explode;
+    main.pinsG.position.y = -0.3 * st.explode;
+
+    shadow.position.set(r.position.x, r.position.y - 0.85 * s - 0.25 - st.explode * 0.4 * s, -0.6);
+    shadow.scale.set(3.6 * s, 1.2 * s, 1);
+    shadow.material.opacity = 0.5 * Math.max(0, 1 - Math.abs(st.rotX) / 1.1) * (1 - st.explode * 0.35);
+
+    renderer.render(scene, camera);
+
+    const offX = wrap.offsetLeft, offY = wrap.offsetTop, k = narrow ? 0.55 : 1;
+    for (let i = 0; i < callEls.length; i++) {
+      const cfg = S.CALLOUTS[i], a = (cfg.g === "A" ? S.callA : S.callB).a, c = callEls[i];
+      if (a < 0.01) { if (c.el.style.opacity !== "0") c.el.style.opacity = "0"; continue; }
+      main.anchors[i].getWorldPosition(v); v.project(camera);
+      const px = (v.x + 1) / 2 * W + offX, py = (1 - v.y) / 2 * H + offY;
+      const dx = cfg.dx * k, dy = cfg.dy * k, len = Math.hypot(dx, dy) * a;
+      c.el.style.opacity = String(a);
+      c.el.style.transform = `translate(${px}px, ${py}px)`;
+      c.leader.style.width = len + "px";
+      c.leader.style.transform = `rotate(${Math.atan2(dy, dx)}rad)`;
+      c.tag.style.transform = `translate(${dx}px, ${dy}px) translate(${dx < 0 ? "-100%" : "0"}, -50%)`;
+    }
+
+    if (!S.ready3d) {
+      S.ready3d = true;
+      canvas.classList.add("ready");
+      const fb = document.getElementById("shoeFallback");
+      if (fb) fb.hidden = true;
+    }
+  });
+}
+
+if (renderer) {
+  try { await init(); } catch (err) { console.error(err); S.useFallback(); }
+}
+</script>
+</body>
+</html>
